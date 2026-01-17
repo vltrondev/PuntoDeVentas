@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Register() {
@@ -31,13 +31,13 @@ export default function Register() {
     }
 
     const { error } = await signUp(email, password)
-    
+
     if (error) {
       setError('Error al crear la cuenta. Por favor intenta de nuevo.')
     } else {
       navigate('/')
     }
-    
+
     setLoading(false)
   }
 

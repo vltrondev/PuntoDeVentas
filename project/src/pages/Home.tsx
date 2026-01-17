@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ShoppingBag, Users, Shield, Truck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -38,7 +38,7 @@ export default function Home() {
 
       if (productsResponse.error) throw productsResponse.error
       if (categoriesResponse.error) throw categoriesResponse.error
-      
+
       if (productsResponse.data) setFeaturedProducts(productsResponse.data as Product[])
       if (categoriesResponse.data) setCategories(categoriesResponse.data as Category[])
     } catch (error) {
@@ -81,7 +81,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute -top-1/2 -left-1/2 w-96 h-96 bg-white opacity-5 rounded-full animate-bounce-subtle"></div>
@@ -100,7 +100,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold mb-2">Envío Gratis</h3>
               <p className="text-gray-600">En compras superiores a $100.000</p>
             </div>
-            
+
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary-100 text-secondary-600 rounded-full mb-4 group-hover:scale-110 transition-transform">
                 <Shield className="h-8 w-8" />
@@ -108,7 +108,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold mb-2">Compra Segura</h3>
               <p className="text-gray-600">Transacciones 100% protegidas</p>
             </div>
-            
+
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-100 text-accent-600 rounded-full mb-4 group-hover:scale-110 transition-transform">
                 <Users className="h-8 w-8" />
@@ -131,7 +131,7 @@ export default function Home() {
               Encuentra exactamente lo que buscas en nuestras categorías especializadas
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {categories.map((category) => (
               <div key={category.id} className="animate-slide-up">
@@ -139,7 +139,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           <div className="text-center">
             <Link to="/categorias" className="btn-primary">
               Ver Todas las Categorías
@@ -160,7 +160,7 @@ export default function Home() {
               Los productos más populares seleccionados especialmente para ti
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredProducts.map((product, index) => (
               <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
@@ -168,7 +168,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           <div className="text-center">
             <Link to="/productos" className="btn-primary">
               Ver Todos los Productos

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Printer, Package, User } from 'lucide-react';
-import type { Order } from '../types';
+
 
 interface InvoiceDetailModalProps {
     order: any; // Using any for now to handle Joined data (contacts, profiles)

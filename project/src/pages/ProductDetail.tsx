@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ShoppingCart, Heart, Share2, Star, Truck, Shield, RotateCcw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -23,9 +23,9 @@ export default function ProductDetail() {
 
   const fetchProduct = async () => {
     if (!id) return
-    
+
     setLoading(true)
-    
+
     // Fetch product
     const { data: productData } = await supabase
       .from('products')
@@ -35,7 +35,7 @@ export default function ProductDetail() {
 
     if (productData) {
       setProduct(productData)
-      
+
       // Fetch related products
       const { data: relatedData } = await supabase
         .from('products')
@@ -43,12 +43,12 @@ export default function ProductDetail() {
         .eq('category_id', productData.category_id)
         .neq('id', id)
         .limit(4)
-        
+
       if (relatedData) {
         setRelatedProducts(relatedData)
       }
     }
-    
+
     setLoading(false)
   }
 
@@ -118,7 +118,7 @@ export default function ProductDetail() {
               <h1 className="text-3xl font-bold text-gray-800 mb-4">
                 {product.name}
               </h1>
-              
+
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -152,7 +152,7 @@ export default function ProductDetail() {
                   </button>
                   <span className="px-4 py-2 font-semibold">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    onClick={() => setQuantity(Math.min(product.stock || 0, quantity + 1))}
                     className="p-2 hover:bg-gray-50 transition-colors"
                   >
                     +

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { ShoppingCart, Trash2, Plus, Minus, CheckCircle, FileText, X } from 'lucide-react'

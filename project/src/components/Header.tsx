@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, ShoppingCart, User, LogOut, Menu, X } from 'lucide-react'
+import { Search, User, LogOut, Menu, X } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { useCart } from '../hooks/useCart'
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const { user, signOut, isAdmin } = useAuth()
-  const { cartCount } = useCart()
+
 
   const handleSignOut = async () => {
     await signOut()
@@ -21,9 +21,9 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">M</span>
+              <span className="text-white font-bold text-lg">P</span>
             </div>
-            <span className="text-xl font-bold text-gray-800">MiPuntoDeVenta</span>
+            <span className="text-xl font-bold text-gray-800">Punto de ventas</span>
           </Link>
 
           {/* Search Bar - Desktop */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PlusCircle, Trash2, Edit, User } from 'lucide-react'
 import { supabase } from '../lib/supabase'

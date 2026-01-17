@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
 import { Trash2, Plus, Minus, ShoppingCart } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
@@ -80,7 +80,7 @@ export default function Cart() {
                     alt={item.product?.name}
                     className="w-20 h-20 object-cover rounded-lg"
                   />
-                  
+
                   <div className="flex-1 text-center sm:text-left">
                     <h3 className="font-semibold text-gray-800">
                       {item.product?.name}
@@ -92,7 +92,7 @@ export default function Cart() {
                       {formatPrice(item.product?.price || 0)}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -110,7 +110,7 @@ export default function Cart() {
                       <Plus className="h-4 w-4 text-gray-600" />
                     </button>
                   </div>
-                  
+
                   <div className="text-right">
                     <p className="font-bold text-lg text-gray-800">
                       {formatPrice((item.product?.price || 0) * item.quantity)}
@@ -133,7 +133,7 @@ export default function Cart() {
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 Resumen del Pedido
               </h2>
-              
+
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
@@ -150,11 +150,11 @@ export default function Cart() {
                   </div>
                 </div>
               </div>
-              
+
               <button className="w-full btn-primary mb-4">
                 Proceder al Pago
               </button>
-              
+
               <Link
                 to="/productos"
                 className="w-full btn-secondary block text-center"

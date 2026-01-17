@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 import { Package, Users, BarChart2, PlusCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';

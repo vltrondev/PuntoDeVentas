@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
 import type { Category } from '../types'
 
@@ -23,7 +23,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
             </h3>
           </div>
         </div>
-        
+
         <div className="p-4">
           <p className="text-gray-600 text-sm">{category.description}</p>
         </div>

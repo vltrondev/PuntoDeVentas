@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Search, Filter, SortAsc, PlusCircle } from 'lucide-react'
+import { Search, PlusCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Product, Category } from '../types'
 import ProductCard from '../components/ProductCard'
