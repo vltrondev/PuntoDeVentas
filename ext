@@ -1,0 +1,59 @@
+¡Hola! Con gusto te explico cómo puedes ejecutar este proyecto de e-commerce y qué necesitas para ponerlo en marcha.
+
+Analizando los archivos, este es un proyecto moderno de React construido con TypeScript, que utiliza Supabase como backend (base de datos, autenticación, etc.) y Tailwind CSS para los estilos.
+
+Requisitos Previos
+Antes de empezar, asegúrate de tener instalado lo siguiente en tu sistema:
+
+Node.js: Es el entorno de ejecución para JavaScript. Puedes descargarlo desde nodejs.org. Al instalarlo, también se instala npm, el gestor de paquetes de Node.
+Supabase CLI: Es la herramienta de línea de comandos para gestionar tu proyecto de Supabase localmente. La necesitarás para levantar la base de datos y aplicar las migraciones. Puedes instalarla siguiendo las instrucciones oficiales de Supabase.
+Una cuenta de Supabase: Necesitarás una cuenta gratuita en supabase.com para crear un proyecto en la nube, aunque desarrollaremos principalmente en local.
+Pasos para Ejecutar el Proyecto
+Sigue estos pasos en la terminal, dentro de la carpeta raíz de tu proyecto (project-bolt-sb1-8jcrhqnq/project/).
+
+1. Instalar Dependencias del Proyecto
+Primero, necesitas instalar todos los paquetes que el proyecto utiliza (React, Supabase, etc.).
+
+bash
+npm install
+2. Configurar Supabase
+Este proyecto depende de Supabase para funcionar. Usaremos la Supabase CLI para crear una instancia local que replique el entorno de producción.
+
+a. Inicia los servicios de Supabase: Este comando descargará las imágenes de Docker necesarias y levantará una base de datos PostgreSQL, un sistema de autenticación y todo lo que Supabase ofrece, pero en tu máquina.
+
+bash
+supabase start
+b. Aplica la migración de la base de datos: El archivo supabase/migrations/20250914184627_royal_wildflower.sql contiene la estructura de las tablas (products, categories, etc.) y datos de ejemplo. Para cargar todo esto en tu base de datos local, ejecuta:
+
+bash
+supabase db reset
+Este comando limpiará la base de datos local y aplicará todas las migraciones que encuentre en la carpeta supabase/migrations.
+
+3. Configurar las Variables de Entorno
+La aplicación de React necesita saber cómo conectarse a tu instancia local de Supabase.
+
+a. Cuando ejecutaste supabase start, la terminal te mostró unas claves (keys). Búscalas, se verán algo así:
+
+plaintext
+API URL: http://127.0.0.1:54321
+DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+Studio URL: http://127.0.0.1:54323
+anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+b. Crea un archivo llamado .env.local en la raíz de tu proyecto (project-bolt-sb1-8jcrhqnq/project/).
+
+c. Copia la API URL y la anon key en ese archivo de la siguiente manera. Es común en proyectos con Vite (una herramienta de construcción para React) que las variables de entorno lleven el prefijo VITE_.
+
+plaintext
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Importante: Reemplaza la URL y la clave con las que te generó tu terminal. El archivo src/lib/supabase.ts (que no está en el contexto pero es fundamental) usará estas variables para inicializar el cliente de Supabase.
+
+4. Ejecutar la Aplicación
+¡Ya está todo listo! Ahora solo tienes que iniciar el servidor de desarrollo de React.
+
+bash
+npm run dev
+Esto iniciará la aplicación, y deberías ver un mensaje en la terminal indicando la dirección para abrir en tu navegador, usualmente http://localhost:5173.
+
+¡Y listo! Al abrir esa URL, deberías ver la página de inicio de "MiTienda Online" funcionando con los productos y categorías de tu base de datos local.

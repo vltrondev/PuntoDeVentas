@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados para componentes comunes */
+body {
+    @apply bg-gray-50 text-gray-800 antialiased;
+}
+
+.btn-primary {
+    @apply bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+    @apply bg-transparent border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center;
+}
+
+.card {
+    @apply bg-white rounded-lg shadow-md transition-shadow duration-300 hover:shadow-xl;
+}
+
+.input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
+}
+
+@media print {
+    body {
+        visibility: hidden;
+    }
+
+    .print-this,
+    .print-this * {
+        visibility: visible;
+    }
+
+    .print-this {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        z-index: 9999;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    /* Hide shadows and borders for cleaner print */
+    .shadow-xl {
+        box-shadow: none !important;
+    }
+
+    .fixed {
+        position: absolute !important;
+        background: none !important;
+    }
+}
