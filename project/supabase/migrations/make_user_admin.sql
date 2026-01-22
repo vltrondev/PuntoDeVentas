@@ -2,3 +2,8 @@
 UPDATE profiles
 SET role = 'admin'
 WHERE email = 'correo@ejemplo.com';
+
+
+
+
+UPDATE profiles SET role = 'courier' WHERE email = 'courier@example.com';

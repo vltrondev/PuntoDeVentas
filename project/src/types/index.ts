@@ -3,6 +3,7 @@ export interface Product {
   name: string
   description?: string
   price: number
+  cost?: number
   image_url?: string
   category_id?: string
   stock?: number
@@ -31,10 +32,13 @@ export interface Order {
   id: string
   user_id: string
   total: number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'paid' | 'cancelled'
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'paid' | 'cancelled' | 'suspended'
   created_at: string
   order_type?: 'sale' | 'invoice'
   payment_method?: 'cash' | 'transfer' | 'card' | 'other'
+  shipping_cost?: number
+  assigned_to?: string
+  courier_id?: string
 }
 
 export interface Contact {

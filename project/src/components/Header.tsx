@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, User, LogOut, Menu, X } from 'lucide-react'
+import { Search, User, LogOut, Menu, X, DollarSign } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Header() {
@@ -21,9 +21,9 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
+              <span className="text-white font-bold text-lg">NC</span>
             </div>
-            <span className="text-xl font-bold text-gray-800">Punto de ventas</span>
+            <span className="text-xl font-bold text-gray-800">GRUPO NC</span>
           </Link>
 
           {/* Search Bar - Desktop */}
@@ -53,6 +53,13 @@ export default function Header() {
                     <span className="text-sm">{user.email?.split('@')[0]}</span>
                   </button>
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                    <Link
+                      to="/mis-ventas"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                    >
+                      <DollarSign className="h-4 w-4" />
+                      <span>Mis Ventas</span>
+                    </Link>
                     <button
                       onClick={handleSignOut}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg flex items-center space-x-2"
@@ -107,6 +114,14 @@ export default function Header() {
                       Panel de Admin
                     </Link>
                   )}
+                  <Link
+                    to="/mis-ventas"
+                    className="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors flex items-center space-x-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <DollarSign className="h-4 w-4" />
+                    <span>Mis Ventas</span>
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     className="w-full text-left px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors flex items-center space-x-2"

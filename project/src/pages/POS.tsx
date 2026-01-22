@@ -26,7 +26,7 @@ export default function POS() {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-2xl mb-4">Por favor, inicia sesión para usar el Punto de Venta.</h1>
+        <h1 className="text-2xl mb-4">Por favor, inicia sesión para usar GRUPO NC.</h1>
         <Link to="/login" className="btn-primary">
           Iniciar Sesión
         </Link>

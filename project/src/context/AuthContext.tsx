@@ -7,6 +7,7 @@ interface AuthContextType {
     session: Session | null;
     role: string | null;
     isAdmin: boolean;
+    isCourier: boolean;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<any>;
     signUp: (email: string, password: string) => Promise<any>;
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         role,
         isAdmin: role?.toLowerCase() === 'admin',
+        isCourier: role?.toLowerCase() === 'courier',
         loading,
         signIn,
         signUp,

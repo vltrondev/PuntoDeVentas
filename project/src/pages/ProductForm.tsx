@@ -11,6 +11,7 @@ export default function ProductForm() {
     name: '',
     description: '',
     price: 0,
+    cost: 0,
     stock: 0,
     category_id: '',
     featured: false,
@@ -94,6 +95,7 @@ export default function ProductForm() {
       name: product.name,
       description: product.description,
       price: product.price,
+      cost: product.cost, // Add cost field
       stock: product.stock,
       category_id: product.category_id,
       featured: product.featured,
@@ -138,8 +140,12 @@ export default function ProductForm() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Precio</label>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Precio Venta</label>
             <input type="number" name="price" id="price" value={product.price} onChange={handleChange} className="input-field mt-1" required />
+          </div>
+          <div>
+            <label htmlFor="cost" className="block text-sm font-medium text-gray-700">Costo (Admin)</label>
+            <input type="number" name="cost" id="cost" value={product.cost || 0} onChange={handleChange} className="input-field mt-1" />
           </div>
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock (Inventario)</label>

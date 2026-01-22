@@ -33,7 +33,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">M</span>
+            <span className="text-white font-bold text-2xl">NC</span>
           </div>
           <h2 className="text-3xl font-bold text-gray-800">
             Bienvenido de nuevo

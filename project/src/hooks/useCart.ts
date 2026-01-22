@@ -146,7 +146,8 @@ export function useCart() {
     assignedTo?: string,
     orderType: 'sale' | 'invoice' = 'sale',
     paymentMethod: 'cash' | 'transfer' | 'card' | 'other' | null = null,
-    status: 'pending' | 'paid' = 'pending'
+    status: 'pending' | 'paid' = 'pending',
+    shippingCost: number = 0
   ) => {
     if (!user) return { error: new Error("User not authenticated") };
     if (cartItems.length === 0) return { error: new Error("Cart is empty") };
@@ -158,7 +159,8 @@ export function useCart() {
       p_assigned_to: assignedTo || null,
       p_order_type: orderType,
       p_payment_method: paymentMethod,
-      p_status: status
+      p_status: status,
+      p_shipping_cost: shippingCost
     });
     setLoading(false);
 

@@ -157,20 +157,39 @@ export default function InvoiceDetailModal({ order, onClose }: InvoiceDetailModa
                                                     {item.quantity}
                                                 </td>
                                                 <td className="px-4 py-2 text-sm text-gray-500 text-right">
-                                                    {formatPrice(item.price_at_time || item.product?.price || 0)}
+                                                    {formatPrice(item.price || item.product?.price || 0)}
                                                 </td>
                                                 <td className="px-4 py-2 text-sm text-gray-900 text-right font-medium">
-                                                    {formatPrice((item.price_at_time || item.product?.price || 0) * item.quantity)}
+                                                    {formatPrice((item.price || item.product?.price || 0) * item.quantity)}
                                                 </td>
                                             </tr>
                                         ))
                                     )}
                                 </tbody>
                                 <tfoot className="bg-gray-50">
-                                    <tr>
-                                        <td colSpan={3} className="px-4 py-3 text-right text-sm font-bold text-gray-900">Total:</td>
-                                        <td className="px-4 py-3 text-right text-sm font-bold text-gray-900">{formatPrice(order.total)}</td>
-                                    </tr>
+                                    {(() => {
+                                        const subtotal = items.reduce((sum, item) => sum + ((item.price || item.product?.price || 0) * item.quantity), 0);
+                                        const shipping = order.shipping_cost || 0;
+
+                                        return (
+                                            <>
+                                                <tr>
+                                                    <td colSpan={3} className="px-4 py-2 text-right text-sm font-medium text-gray-500">Subtotal:</td>
+                                                    <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">{formatPrice(subtotal)}</td>
+                                                </tr>
+                                                {shipping > 0 && (
+                                                    <tr>
+                                                        <td colSpan={3} className="px-4 py-2 text-right text-sm font-medium text-gray-500">Envío:</td>
+                                                        <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">{formatPrice(shipping)}</td>
+                                                    </tr>
+                                                )}
+                                                <tr>
+                                                    <td colSpan={3} className="px-4 py-3 text-right text-sm font-bold text-gray-900">Total:</td>
+                                                    <td className="px-4 py-3 text-right text-sm font-bold text-gray-900">{formatPrice(order.total)}</td>
+                                                </tr>
+                                            </>
+                                        );
+                                    })()}
                                 </tfoot>
                             </table>
                         </div>

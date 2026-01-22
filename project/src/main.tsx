@@ -14,6 +14,9 @@ import UpdatePassword from './pages/UpdatePassword'
 import { AuthProvider } from './context/AuthContext'
 import AdminLayout from './components/AdminLayout'
 import AdminPanel from './pages/AdminPanel'
+import SellerDashboard from './pages/SellerDashboard'
+import CourierLayout from './components/CourierLayout'
+import CourierDashboard from './pages/CourierDashboard'
 import Products from './pages/Products'
 import ProductForm from './pages/ProductForm'
 import Contacts from './components/Contacts'
@@ -31,6 +34,7 @@ const router = createBrowserRouter([
       { path: '/registro', element: <Register /> },
       { path: '/olvide-password', element: <ForgotPassword /> },
       { path: '/actualizar-password', element: <UpdatePassword /> },
+      { path: '/mis-ventas', element: <SellerDashboard /> }, // Add route
       {
         path: '/admin',
         element: <AdminLayout />,
@@ -52,6 +56,13 @@ const router = createBrowserRouter([
         ]
       }
     ],
+  },
+  {
+    path: '/mensajero',
+    element: <CourierLayout />,
+    children: [
+      { index: true, element: <CourierDashboard /> },
+    ]
   },
 ])
 

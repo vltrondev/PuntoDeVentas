@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { FileText, User, ShoppingBag, Search } from 'lucide-react'
+import { FileText, ShoppingBag, Search } from 'lucide-react'
 
 import InvoiceDetailModal from '../components/InvoiceDetailModal';
+import CourierSettlementModal from '../components/CourierSettlementModal';
 
 export default function Invoices() {
     const [orders, setOrders] = useState<any[]>([])
     const [selectedOrder, setSelectedOrder] = useState<any>(null)
+    const [showSettlementModal, setShowSettlementModal] = useState(false)
     const [loading, setLoading] = useState(true)
 
     // Filter states
@@ -92,11 +94,10 @@ export default function Invoices() {
         // Removed window.confirm to avoid UI blocking issues
 
         try {
-            // We update to 'delivered' because 'paid' violates the default check constraint in DB.
-            // In the UI, we map 'delivered' to 'Pagado'.
+            // Update to 'paid' now
             const { data, error } = await supabase
                 .from('orders')
-                .update({ status: 'delivered' })
+                .update({ status: 'paid' })
                 .eq('id', orderId)
                 .select();
 
@@ -118,11 +119,78 @@ export default function Invoices() {
 
             // Update local state
             setOrders(orders.map(o =>
-                o.id === orderId ? { ...o, status: 'delivered' } : o
+                o.id === orderId ? { ...o, status: 'paid' } : o
             ));
         } catch (error: any) {
             console.error('Error updating status:', error);
             alert('Error inesperado: ' + (error.message || error));
+        }
+    };
+
+    const handleCancel = async (orderId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (!window.confirm('¿Estás seguro de que deseas cancelar esta factura? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: 'cancelled' })
+                .eq('id', orderId);
+
+            if (error) {
+                console.error('Supabase Error:', error);
+                alert('Error al cancelar: ' + error.message);
+                return;
+            }
+
+            // Update local state
+            setOrders(orders.map(o =>
+                o.id === orderId ? { ...o, status: 'cancelled' } : o
+            ));
+        } catch (error: any) {
+            console.error('Error updating status:', error);
+            alert('Error inesperado: ' + (error.message || error));
+        }
+    };
+
+    const handleAssign = async (orderId: string, userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ assigned_to: userId || null })
+                .eq('id', orderId);
+
+            if (error) throw error;
+
+            // Update local state
+            setOrders(orders.map(o =>
+                o.id === orderId ? { ...o, assigned_to: userId || null, assigned_profile: users.find(u => u.id === userId) } : o
+            ));
+        } catch (error: any) {
+            console.error('Error assigning order:', error);
+            alert('Error al asignar: ' + error.message);
+        }
+    };
+
+    const handleAssignCourier = async (orderId: string, userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ courier_id: userId || null })
+                .eq('id', orderId);
+
+            if (error) throw error;
+
+            // Update local state
+            setOrders(orders.map(o =>
+                o.id === orderId ? { ...o, courier_id: userId || null } : o
+            ));
+        } catch (error: any) {
+            console.error('Error assigning courier:', error);
+            alert('Error al asignar mensajero: ' + error.message);
         }
     };
 
@@ -140,7 +208,16 @@ export default function Invoices() {
     return (
         <div>
             <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Historial de Ventas</h1>
+                <div className="flex items-center gap-4">
+                    <h1 className="text-3xl font-bold text-gray-800">Historial de Ventas</h1>
+                    <button
+                        onClick={() => setShowSettlementModal(true)}
+                        className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm flex items-center gap-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" /><line x1="8" x2="16" y1="6" y2="6" /><line x1="8" x2="16" y1="10" y2="10" /><path d="M16 14h-8" /><path d="M12 14v4" /><path d="M8 18h8" /></svg>
+                        Calc. Mensajero
+                    </button>
+                </div>
 
                 <div className="flex flex-col md:flex-row gap-4 mt-4 md:mt-0 w-full md:w-auto bg-white p-3 rounded-lg shadow-sm items-end">
                     {/* Search Bar */}
@@ -193,7 +270,8 @@ export default function Invoices() {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha / ID</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asignado A</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendedor</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensajero</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -202,7 +280,7 @@ export default function Invoices() {
                     <tbody className="bg-white divide-y divide-gray-200">
                         {filteredOrders.map((order) => {
                             const isInvoice = order.order_type === 'invoice';
-                            const showChargeButton = order.status === 'pending';
+                            const showChargeButton = order.status === 'pending' || order.status === 'delivered';
 
                             return (
                                 <tr
@@ -223,38 +301,71 @@ export default function Invoices() {
                                         <div className="text-sm text-gray-900">{order.contacts?.name || 'Cliente Casual'}</div>
                                         <div className="text-xs text-gray-500">{order.contacts?.email}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" onClick={() => setSelectedOrder(order)}>
-                                        {/* We display raw ID if name not found, or 'Sin asignar' */}
-                                        {order.assigned_to ? (
-                                            <span className="flex items-center text-blue-600">
-                                                <User className="w-3 h-3 mr-1" />
-                                                {/* In a real app we would map this ID to a name from a profiles lookup */}
-                                                {order.assigned_profile?.email || order.assigned_to.substring(0, 8) + '...'}
-                                            </span>
-                                        ) : (
-                                            <span className="text-gray-400">-</span>
-                                        )}
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <select
+                                            value={order.assigned_to || ''}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => handleAssign(order.id, e.target.value)}
+                                            className="block w-full pl-3 pr-10 py-1 text-xs border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                                        >
+                                            <option value="">Sin asignar</option>
+                                            {users.map(u => (
+                                                <option key={u.id} value={u.id}>
+                                                    {u.email} {u.role === 'courier' ? '(M)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <select
+                                            value={order.courier_id || ''}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => handleAssignCourier(order.id, e.target.value)}
+                                            className="block w-full pl-3 pr-10 py-1 text-xs border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-blue-50"
+                                        >
+                                            <option value="">Sin asignar</option>
+                                            {/* Show only couriers or all users ideally? User said "assign to delivery". Filtering by role 'courier' is best if roles are strict, but I'll show all with emphasis on (M) */}
+                                            {users.map(u => (
+                                                <option key={u.id} value={u.id} className={u.role === 'courier' ? 'font-bold' : ''}>
+                                                    {u.email} {u.role === 'courier' ? '(M)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900" onClick={() => setSelectedOrder(order)}>
                                         {formatPrice(order.total)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center" onClick={() => setSelectedOrder(order)}>
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${(order.status === 'paid' || order.status === 'delivered') ? 'bg-green-100 text-green-800' :
-                                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                'bg-gray-100 text-gray-800'
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${(order.status === 'paid') ? 'bg-green-100 text-green-800' :
+                                            (order.status === 'delivered') ? 'bg-blue-100 text-blue-800' :
+                                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                    order.status === 'suspended' ? 'bg-orange-100 text-orange-800' :
+                                                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                                            'bg-gray-100 text-gray-800'
                                             }`}>
-                                            {(order.status === 'paid' || order.status === 'delivered') ? 'Pagado' :
-                                                order.status === 'pending' ? 'Pendiente' : order.status}
+                                            {(order.status === 'paid') ? 'Pagado' :
+                                                (order.status === 'delivered') ? 'Entregado' :
+                                                    order.status === 'pending' ? 'Pendiente' :
+                                                        order.status === 'suspended' ? 'Suspendido' :
+                                                            order.status === 'cancelled' ? 'Cancelado' : order.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                         {showChargeButton && (
-                                            <button
-                                                onClick={(e) => handleCharge(order.id, e)}
-                                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition-colors shadow-sm z-50 relative"
-                                            >
-                                                Cobrar
-                                            </button>
+                                            <div className="flex justify-center gap-2">
+                                                <button
+                                                    onClick={(e) => handleCharge(order.id, e)}
+                                                    className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition-colors shadow-sm z-50 relative"
+                                                >
+                                                    {order.status === 'delivered' ? 'Confirmar Pago' : 'Cobrar'}
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleCancel(order.id, e)}
+                                                    className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors shadow-sm z-50 relative"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            </div>
                                         )}
                                     </td>
                                 </tr>
@@ -267,6 +378,13 @@ export default function Invoices() {
                     <div className="p-12 text-center text-gray-500">No hay registros de ventas o facturas.</div>
                 )}
             </div>
+
+            {showSettlementModal && (
+                <CourierSettlementModal
+                    onClose={() => setShowSettlementModal(false)}
+                    onUpdate={fetchOrders}
+                />
+            )}
 
             {selectedOrder && (
                 <InvoiceDetailModal
