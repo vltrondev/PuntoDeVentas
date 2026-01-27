@@ -184,6 +184,7 @@ export default function SellerDashboard() {
                                                     cancelled: { label: 'Cancelada', className: 'bg-red-100 text-red-800' },
                                                     paid: { label: 'Pagado', className: 'bg-emerald-100 text-emerald-800' },
                                                     completed: { label: 'Completado', className: 'bg-green-100 text-green-800' },
+                                                    assigned: { label: 'Asignada', className: 'bg-indigo-100 text-indigo-800' },
                                                 }
                                                 const config = statusConfig[order.status] || { label: order.status, className: 'bg-gray-100 text-gray-800' }
 

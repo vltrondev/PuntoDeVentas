@@ -84,6 +84,7 @@ export default function CourierDashboard() {
             case 'suspended': return 'bg-orange-100 text-orange-800';
             case 'delivered': return 'bg-blue-100 text-blue-800';
             case 'cancelled': return 'bg-red-100 text-red-800';
+            case 'assigned': return 'bg-indigo-100 text-indigo-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
@@ -97,6 +98,7 @@ export default function CourierDashboard() {
             case 'pending': return 'Pendiente';
             case 'processing': return 'Procesando';
             case 'shipped': return 'En camino';
+            case 'assigned': return 'Asignada';
             default: return status;
         }
     };
@@ -104,8 +106,9 @@ export default function CourierDashboard() {
     // Calculate Daily Stats
     const todayOrders = orders.filter(order => isToday(new Date(order.created_at)));
     const deliveredToday = todayOrders.filter(order => order.status === 'paid' || order.status === 'delivered').length;
-    const pendingToday = todayOrders.filter(order => order.status === 'pending' || order.status === 'processing' || order.status === 'shipped').length;
+    const pendingToday = todayOrders.filter(order => order.status === 'pending' || order.status === 'processing' || order.status === 'shipped' || order.status === 'assigned').length;
     const suspendedToday = todayOrders.filter(order => order.status === 'suspended').length;
+    const dailyEarnings = deliveredToday * 250;
     const totalMoneyToday = todayOrders
         .filter(order => order.status === 'paid' || order.status === 'delivered')
         .reduce((sum, order) => sum + (order.total + (order.shipping_cost || 0)), 0);
@@ -150,7 +153,17 @@ export default function CourierDashboard() {
             </div>
 
             {/* Daily Tracker */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm text-gray-500">Ganancias Hoy</p>
+                        <p className="text-2xl font-bold text-amber-600">${dailyEarnings.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-amber-100 p-2 rounded-lg">
+                        <DollarSign className="h-6 w-6 text-amber-600" />
+                    </div>
+                </div>
+
                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
                         <p className="text-sm text-gray-500">Entregados Hoy</p>
@@ -196,7 +209,7 @@ export default function CourierDashboard() {
                 {filteredOrders.map((order) => {
                     const contact = (order as any).contacts;
                     const items = (order as any).order_items || [];
-                    const isPending = order.status === 'pending' || order.status === 'processing' || order.status === 'shipped';
+                    const isPending = order.status === 'pending' || order.status === 'processing' || order.status === 'shipped' || order.status === 'assigned';
 
                     return (
                         <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">

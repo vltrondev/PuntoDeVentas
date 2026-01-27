@@ -42,17 +42,27 @@ export function useCart() {
     const previousCartItems = [...cartItems] // Backup for rollback
 
     if (existingItemIndex > -1) {
+      // Check stock limit for existing item
+      const existingItem = cartItems[existingItemIndex]
+      const currentStock = existingItem.product?.stock ?? 0
+      const newQuantity = existingItem.quantity + quantity
+
+      if (newQuantity > currentStock) {
+        // Optionally notify user here or just return. 
+        // Since we can't return error easily, we just prevent addition.
+        console.warn('Cannot add more items than available stock')
+        return
+      }
+
       // Optimistically update existing item
       const newCartItems = [...cartItems]
       newCartItems[existingItemIndex] = {
         ...newCartItems[existingItemIndex],
-        quantity: newCartItems[existingItemIndex].quantity + quantity
+        quantity: newQuantity
       }
       setCartItems(newCartItems)
 
       // Background DB update
-      const existingItem = cartItems[existingItemIndex]
-      const newQuantity = existingItem.quantity + quantity
       const { error } = await supabase
         .from('cart_items')
         .update({ quantity: newQuantity })
@@ -63,6 +73,12 @@ export function useCart() {
         setCartItems(previousCartItems)
       }
     } else {
+      // Check stock limit for new item
+      if (product && quantity > (product.stock ?? 0)) {
+        console.warn('Cannot add more items than available stock')
+        return
+      }
+
       // Optimistically add new item (ONLY if product is provided for display)
       if (product) {
         const optimisticItem: CartItem = {
@@ -104,6 +120,13 @@ export function useCart() {
   const updateQuantity = async (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       await removeFromCart(itemId)
+      return
+    }
+
+    // Find item to check stock
+    const item = cartItems.find(i => i.id === itemId)
+    if (item && item.product && quantity > (item.product.stock ?? 0)) {
+      // Prevent update if exceeds stock
       return
     }
 
@@ -151,6 +174,16 @@ export function useCart() {
   ) => {
     if (!user) return { error: new Error("User not authenticated") };
     if (cartItems.length === 0) return { error: new Error("Cart is empty") };
+
+    // Strict Stock Check before calling backend
+    const insufficientStockItems = cartItems.filter(item =>
+      item.product && (item.product.stock ?? 0) < item.quantity
+    );
+
+    if (insufficientStockItems.length > 0) {
+      const itemNames = insufficientStockItems.map(i => i.product?.name).join(', ');
+      return { error: new Error(`Stock insuficiente para: ${itemNames}`) };
+    }
 
     setLoading(true);
     const { data, error } = await supabase.rpc('create_order_from_cart', {

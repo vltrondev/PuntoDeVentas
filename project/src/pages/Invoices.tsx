@@ -177,16 +177,25 @@ export default function Invoices() {
 
     const handleAssignCourier = async (orderId: string, userId: string) => {
         try {
+            // If assigning a user (userId exists), set status to 'assigned'
+            // If unassigning (userId is empty), maybe revert to 'pending'? 
+            // For now, let's just handle assignment as requested.
+            const updates: any = { courier_id: userId || null };
+
+            if (userId) {
+                updates.status = 'assigned';
+            }
+
             const { error } = await supabase
                 .from('orders')
-                .update({ courier_id: userId || null })
+                .update(updates)
                 .eq('id', orderId);
 
             if (error) throw error;
 
             // Update local state
             setOrders(orders.map(o =>
-                o.id === orderId ? { ...o, courier_id: userId || null } : o
+                o.id === orderId ? { ...o, ...updates } : o
             ));
         } catch (error: any) {
             console.error('Error assigning courier:', error);

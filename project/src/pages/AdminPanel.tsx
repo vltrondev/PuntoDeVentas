@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Package, Users, BarChart2, PlusCircle } from 'lucide-react';
+import { Package, Users, BarChart2, PlusCircle, DollarSign, TrendingDown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function AdminPanel() {
@@ -30,6 +30,18 @@ export default function AdminPanel() {
           <Link to="/admin/reportes" className="card p-6 text-center hover:border-primary-500 border-2 border-transparent transition-all">
             <BarChart2 className="h-12 w-12 mx-auto text-primary-500 mb-4" />
             <h2 className="text-xl font-semibold">Reportes de Ventas</h2>
+          </Link>
+        )}
+        {isAdmin && (
+          <Link to="/admin/capital" className="card p-6 text-center hover:border-primary-500 border-2 border-transparent transition-all">
+            <DollarSign className="h-12 w-12 mx-auto text-primary-500 mb-4" />
+            <h2 className="text-xl font-semibold">Capital / Ingresos</h2>
+          </Link>
+        )}
+        {isAdmin && (
+          <Link to="/admin/gastos" className="card p-6 text-center hover:border-red-500 border-2 border-transparent transition-all">
+            <TrendingDown className="h-12 w-12 mx-auto text-red-500 mb-4" />
+            <h2 className="text-xl font-semibold">Gastos / Egresos</h2>
           </Link>
         )}
       </div>

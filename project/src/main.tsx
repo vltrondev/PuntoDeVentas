@@ -24,6 +24,8 @@ import ContactForm from './components/ContactForm'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import Invoices from './pages/Invoices'
 import SalesReports from './pages/SalesReports'
+import CapitalInjections from './pages/CapitalInjections'
+import Expenses from './pages/Expenses'
 
 const router = createBrowserRouter([
   {
@@ -51,6 +53,8 @@ const router = createBrowserRouter([
               { path: 'productos/nuevo', element: <ProductForm /> },
               { path: 'productos/editar/:id', element: <ProductForm /> },
               { path: 'reportes', element: <SalesReports /> },
+              { path: 'capital', element: <CapitalInjections /> },
+              { path: 'gastos', element: <Expenses /> },
             ]
           }
         ]

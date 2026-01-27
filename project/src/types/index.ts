@@ -32,7 +32,7 @@ export interface Order {
   id: string
   user_id: string
   total: number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'paid' | 'cancelled' | 'suspended'
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'paid' | 'cancelled' | 'suspended' | 'assigned'
   created_at: string
   order_type?: 'sale' | 'invoice'
   payment_method?: 'cash' | 'transfer' | 'card' | 'other'
