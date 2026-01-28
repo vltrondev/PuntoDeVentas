@@ -257,9 +257,9 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleFinalizeSale}
-            disabled={cartItems.length === 0 || loading || !selectedUserId}
+            disabled={cartItems.length === 0 || loading || !selectedUserId || !isAdmin}
             className="btn-primary text-lg py-3 flex flex-col items-center justify-center bg-gray-800 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={!selectedUserId ? "Selecciona un vendedor" : ""}
+            title={!isAdmin ? "Solo administradores pueden cobrar directamente" : !selectedUserId ? "Selecciona un vendedor" : ""}
           >
             <span>Cobrar</span>
             <span className="text-xs font-normal opacity-80">(Pagado)</span>
