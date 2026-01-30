@@ -6,9 +6,10 @@ import { X, Printer, Package, User } from 'lucide-react';
 interface InvoiceDetailModalProps {
     order: any; // Using any for now to handle Joined data (contacts, profiles)
     onClose: () => void;
+    hidePrint?: boolean;
 }
 
-export default function InvoiceDetailModal({ order, onClose }: InvoiceDetailModalProps) {
+export default function InvoiceDetailModal({ order, onClose, hidePrint = false }: InvoiceDetailModalProps) {
     const [items, setItems] = useState<any[]>([]);
     const [loadingItems, setLoadingItems] = useState(false);
 
@@ -198,13 +199,15 @@ export default function InvoiceDetailModal({ order, onClose }: InvoiceDetailModa
 
                 {/* Footer Actions - Add no-print */}
                 <div className="p-4 border-t border-gray-100 flex justify-end gap-2 bg-gray-50 rounded-b-lg no-print">
-                    <button
-                        onClick={() => window.print()}
-                        className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-                    >
-                        <Printer className="w-4 h-4" />
-                        Imprimir
-                    </button>
+                    {!hidePrint && (
+                        <button
+                            onClick={() => window.print()}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                        >
+                            <Printer className="w-4 h-4" />
+                            Imprimir
+                        </button>
+                    )}
                     <button
                         onClick={onClose}
                         className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"

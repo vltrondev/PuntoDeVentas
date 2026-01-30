@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { format, startOfWeek, endOfWeek } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Calendar, DollarSign, TrendingUp, Search } from 'lucide-react'
+import { Calendar, DollarSign, TrendingUp, Search, Eye } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import InvoiceDetailModal from '../components/InvoiceDetailModal'
 
 interface Order {
     id: string
     created_at: string
     total: number
+    shipping_cost?: number
     status: string
     contact_id: string | null
     contacts?: {
@@ -63,7 +65,15 @@ export default function SellerDashboard() {
     )
 
     const totalSales = commissionableOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0)
-    const commission = totalSales * 0.20
+
+    const commissionBase = commissionableOrders.reduce((sum, order) => {
+        const total = Number(order.total) || 0
+        const shipping = Number(order.shipping_cost) || 0
+        return sum + (total - shipping)
+    }, 0)
+
+    const commission = commissionBase * 0.20
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -151,16 +161,17 @@ export default function SellerDashboard() {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Comisión</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">Cargando ventas...</td>
+                                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">Cargando ventas...</td>
                                 </tr>
                             ) : orders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">No se encontraron ventas en este periodo</td>
+                                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">No se encontraron ventas en este periodo</td>
                                 </tr>
                             ) : (
                                 orders.map((order) => (
@@ -199,7 +210,16 @@ export default function SellerDashboard() {
                                             ${Number(order.total).toFixed(2)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
-                                            +${(Number(order.total) * 0.20).toFixed(2)}
+                                            +${((Number(order.total) - (Number(order.shipping_cost) || 0)) * 0.20).toFixed(2)}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <button
+                                                onClick={() => setSelectedOrder(order)}
+                                                className="text-gray-400 hover:text-blue-600 transition-colors"
+                                                title="Ver detalle"
+                                            >
+                                                <Eye className="h-5 w-5" />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -208,6 +228,14 @@ export default function SellerDashboard() {
                     </table>
                 </div>
             </div>
+
+            {selectedOrder && (
+                <InvoiceDetailModal
+                    order={selectedOrder}
+                    onClose={() => setSelectedOrder(null)}
+                    hidePrint={true}
+                />
+            )}
         </div>
     )
 }
