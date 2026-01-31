@@ -15,6 +15,9 @@ interface Order {
     contact_id: string | null
     contacts?: {
         name: string
+        email?: string
+        phone?: string
+        address?: string
     }
 }
 
@@ -43,7 +46,7 @@ export default function SellerDashboard() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select('*, contacts(name)')
+                .select('*, contacts(name, email, phone, address)')
                 .eq('assigned_to', user?.id)
                 .gte('created_at', new Date(startDate).toISOString())
                 .lte('created_at', adjustedEndDate.toISOString())
