@@ -111,7 +111,7 @@ export default function CourierDashboard() {
     const dailyEarnings = deliveredToday * 250;
     const totalMoneyToday = todayOrders
         .filter(order => order.status === 'paid' || order.status === 'delivered')
-        .reduce((sum, order) => sum + (order.total + (order.shipping_cost || 0)), 0);
+        .reduce((sum, order) => sum + order.total, 0);
 
     if (loading) {
         return (
@@ -225,7 +225,7 @@ export default function CourierDashboard() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-lg font-bold text-primary-600">
-                                            ${(order.total + (order.shipping_cost || 0)).toLocaleString()}
+                                            ${order.total.toLocaleString()}
                                         </p>
                                         <p className="text-xs text-gray-500">Total a cobrar</p>
                                     </div>
