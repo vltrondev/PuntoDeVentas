@@ -20,7 +20,7 @@ export default function Products({ isPOS = false }: ProductsProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('categoria') || '')
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 2000 })
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 })
   const [sortBy, setSortBy] = useState('name_asc')
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function Products({ isPOS = false }: ProductsProps) {
   const clearFilters = () => {
     setSearchTerm('')
     setSelectedCategory('')
-    setPriceRange({ min: 0, max: 2000 })
+    setPriceRange({ min: 0, max: 1000000 })
     setSortBy('name_asc')
   }
 
