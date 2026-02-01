@@ -50,7 +50,7 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
             />
           </div>
           {isAdmin && (
-            <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
               <Link to={`/admin/productos/editar/${product.id}`} className="p-2 bg-white rounded-full shadow-lg hover:bg-blue-100 transition-colors"><Edit className="h-4 w-4 text-blue-600" /></Link>
               <button onClick={handleDelete} className="p-2 bg-white rounded-full shadow-lg hover:bg-red-100 transition-colors"><Trash2 className="h-4 w-4 text-red-600" /></button>
             </div>
