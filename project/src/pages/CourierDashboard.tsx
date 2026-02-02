@@ -54,15 +54,29 @@ export default function CourierDashboard() {
 
         setProcessingId(orderId);
         try {
+            const updates: any = { status: newStatus };
+            if (newStatus === 'delivered') {
+                updates.delivered_at = new Date().toISOString();
+            }
+
             const { error } = await supabase
                 .from('orders')
-                .update({ status: newStatus })
+                .update(updates)
                 .eq('id', orderId);
 
             if (error) throw error;
 
             // Update local state
-            setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+            setOrders(orders.map(o => {
+                if (o.id === orderId) {
+                    return {
+                        ...o,
+                        status: newStatus,
+                        delivered_at: newStatus === 'delivered' ? updates.delivered_at : o.delivered_at
+                    };
+                }
+                return o;
+            }));
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Error al actualizar el estado de la orden');
@@ -104,11 +118,34 @@ export default function CourierDashboard() {
     };
 
     // Calculate Daily Stats
-    const todayOrders = orders.filter(order => isToday(new Date(order.created_at)));
+    const todayOrders = orders.filter(order => {
+        // If order is delivered/paid, check delivered_at
+        if (order.status === 'delivered' || order.status === 'paid') {
+            if (order.delivered_at) {
+                return isToday(new Date(order.delivered_at));
+            }
+            // Fallback for old orders or if delivered_at missing
+            return isToday(new Date(order.created_at));
+        }
+        // For other statuses, check created_at (or updated_at if we had it, but mostly relevant for today's activity)
+        return isToday(new Date(order.created_at));
+    });
+
     const deliveredToday = todayOrders.filter(order => order.status === 'paid' || order.status === 'delivered').length;
-    const pendingToday = todayOrders.filter(order => order.status === 'pending' || order.status === 'processing' || order.status === 'shipped' || order.status === 'assigned').length;
+
+    // For pending/assigned, we want to see what is CURRENTLY pending regardless of when it was created, 
+    // OR just what was assigned today. 
+    // Usually a dashboard shows "What do I have to do TODAY".
+    // If I have an order from yesterday that is still hanging, it should appear in the list (it does, in `filteredOrders`),
+    // but maybe not in "Assigned TODAY" stats if strictly "Today". 
+    // However, the user request says "orders delivered don't appear in dashboard".
+    // Let's stick to "Activity Today" for the stats counters.
+
+    const pendingToday = todayOrders.filter(order => ['pending', 'processing', 'shipped', 'assigned'].includes(order.status)).length;
     const suspendedToday = todayOrders.filter(order => order.status === 'suspended').length;
-    const dailyEarnings = deliveredToday * 250;
+
+    const dailyEarnings = deliveredToday * 250; // Fixed commission per order
+
     const totalMoneyToday = todayOrders
         .filter(order => order.status === 'paid' || order.status === 'delivered')
         .reduce((sum, order) => sum + order.total, 0);

@@ -39,6 +39,7 @@ export interface Order {
   shipping_cost?: number
   assigned_to?: string
   courier_id?: string
+  delivered_at?: string
 }
 
 export interface Contact {
