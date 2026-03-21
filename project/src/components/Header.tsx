@@ -1,17 +1,18 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, User, LogOut, Menu, X, DollarSign } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const { user, signOut, isAdmin } = useAuth()
-
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
 
   const handleSignOut = async () => {
     await signOut()
     setIsMenuOpen(false)
+    navigate('/login')
   }
 
   return (
@@ -105,15 +106,13 @@ export default function Header() {
             <div className="space-y-2">
               {user ? (
                 <>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      className="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Panel de Admin
-                    </Link>
-                  )}
+                  <Link
+                    to="/admin"
+                    className="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Panel de Admin
+                  </Link>
                   <Link
                     to="/mis-ventas"
                     className="block px-3 py-2 text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded-lg transition-colors flex items-center space-x-2"
