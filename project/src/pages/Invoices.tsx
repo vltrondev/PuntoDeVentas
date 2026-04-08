@@ -4,6 +4,7 @@ import { FileText, ShoppingBag, Search } from 'lucide-react'
 
 import InvoiceDetailModal from '../components/InvoiceDetailModal';
 import CourierSettlementModal from '../components/CourierSettlementModal';
+import SearchableSelect from '../components/SearchableSelect';
 
 export default function Invoices() {
     const [orders, setOrders] = useState<any[]>([])
@@ -212,6 +213,14 @@ export default function Invoices() {
         return idMatch || clientNameMatch || clientEmailMatch
     })
 
+    const userOptions = [
+        { value: '', label: 'Sin asignar' },
+        ...users.map(u => ({
+            value: u.id,
+            label: `${u.email} ${u.role === 'courier' ? '(M)' : ''}`
+        }))
+    ];
+
     if (loading) return <div>Cargando facturas...</div>
 
     return (
@@ -272,7 +281,7 @@ export default function Invoices() {
                 </div>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white shadow-md rounded-lg overflow-visible pb-16">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -311,35 +320,24 @@ export default function Invoices() {
                                         <div className="text-xs text-gray-500">{order.contacts?.email}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <select
-                                            value={order.assigned_to || ''}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onChange={(e) => handleAssign(order.id, e.target.value)}
-                                            className="block w-full pl-3 pr-10 py-1 text-xs border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
-                                        >
-                                            <option value="">Sin asignar</option>
-                                            {users.map(u => (
-                                                <option key={u.id} value={u.id}>
-                                                    {u.email} {u.role === 'courier' ? '(M)' : ''}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <div onClick={(e) => e.stopPropagation()} className="min-w-[150px]">
+                                            <SearchableSelect
+                                                options={userOptions}
+                                                value={order.assigned_to || ''}
+                                                onChange={(val) => handleAssign(order.id, val)}
+                                                placeholder="Sin asignar"
+                                            />
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <select
-                                            value={order.courier_id || ''}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onChange={(e) => handleAssignCourier(order.id, e.target.value)}
-                                            className="block w-full pl-3 pr-10 py-1 text-xs border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-blue-50"
-                                        >
-                                            <option value="">Sin asignar</option>
-                                            {/* Show only couriers or all users ideally? User said "assign to delivery". Filtering by role 'courier' is best if roles are strict, but I'll show all with emphasis on (M) */}
-                                            {users.map(u => (
-                                                <option key={u.id} value={u.id} className={u.role === 'courier' ? 'font-bold' : ''}>
-                                                    {u.email} {u.role === 'courier' ? '(M)' : ''}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <div onClick={(e) => e.stopPropagation()} className="min-w-[150px]">
+                                            <SearchableSelect
+                                                options={userOptions}
+                                                value={order.courier_id || ''}
+                                                onChange={(val) => handleAssignCourier(order.id, val)}
+                                                placeholder="Sin asignar"
+                                            />
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900" onClick={() => setSelectedOrder(order)}>
                                         {formatPrice(order.total)}

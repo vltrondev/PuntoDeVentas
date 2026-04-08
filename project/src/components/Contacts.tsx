@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { PlusCircle, Trash2, Edit, User } from 'lucide-react'
+import { PlusCircle, Trash2, Edit, User, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Contact } from '../types'
 
 export default function Contacts() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     fetchContacts()
@@ -31,6 +32,11 @@ export default function Contacts() {
     }
   }
 
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
   if (loading) {
     return <div>Cargando contactos...</div>
   }
@@ -46,8 +52,20 @@ export default function Contacts() {
       </div>
 
       <div className="bg-white shadow-md rounded-lg">
+        <div className="p-4 border-b">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre o correo..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
         <ul role="list" className="divide-y divide-gray-200">
-          {contacts.map((contact) => (
+          {filteredContacts.map((contact) => (
             <li key={contact.id} className="flex justify-between items-center gap-x-6 p-5">
               <div className="flex items-center min-w-0 gap-x-4">
                 <div className="h-10 w-10 flex-none rounded-full bg-gray-100 flex items-center justify-center">

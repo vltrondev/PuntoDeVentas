@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ShoppingCart, Trash2, Plus, Minus, CheckCircle, FileText, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Contact } from '../types'
+import SearchableSelect from './SearchableSelect'
 
 interface CurrentSaleProps {
   onClose?: () => void;
@@ -57,6 +58,16 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
       minimumFractionDigits: 0
     }).format(price)
   }
+
+  const contactOptions = [
+    { value: '', label: '-- General --' },
+    ...contacts.map(c => ({ value: c.id, label: c.name }))
+  ]
+
+  const userOptions = [
+    { value: '', label: '-- Seleccionar Vendedor --' },
+    ...users.map(u => ({ value: u.id, label: u.email }))
+  ]
 
   const handleFinalizeSale = async () => {
     // Standard sale (Cobrar) -> Mark as PAID immediately
@@ -170,30 +181,22 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Cliente</label>
-              <select
-                className="input-field text-sm py-1"
+              <SearchableSelect
+                options={contactOptions}
                 value={selectedContactId}
-                onChange={(e) => setSelectedContactId(e.target.value)}
-              >
-                <option value="">-- General --</option>
-                {contacts.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+                onChange={setSelectedContactId}
+                placeholder="-- General --"
+              />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Asignar a <span className="text-red-500">*</span></label>
-              <select
-                className="input-field text-sm py-1 disabled:bg-gray-100 disabled:text-gray-500"
+              <SearchableSelect
+                options={userOptions}
                 value={selectedUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
+                onChange={setSelectedUserId}
+                placeholder="-- Seleccionar Vendedor --"
                 disabled={!isAdmin}
-              >
-                <option value="">-- Seleccionar Vendedor --</option>
-                {users.map(u => (
-                  <option key={u.id} value={u.id}>{u.email}</option>
-                ))}
-              </select>
+              />
             </div>
           </div>
 
