@@ -52,10 +52,11 @@ export default function Invoices() {
         if (filterDate) {
             // Create range for the selected day (00:00:00 to 23:59:59 local time generally, or specific UTC range)
             // Ideally we compare against the range of the day.
-            const startDate = new Date(filterDate)
-            startDate.setHours(0, 0, 0, 0)
-            const endDate = new Date(filterDate)
-            endDate.setHours(23, 59, 59, 999)
+            // Parse string carefully to ensure no timezone shift backwards
+            const [y, m, d] = filterDate.split('-')
+            
+            const startDate = new Date(Number(y), Number(m) - 1, Number(d), 0, 0, 0, 0)
+            const endDate = new Date(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999)
 
             query = query.gte('created_at', startDate.toISOString()).lte('created_at', endDate.toISOString())
         }

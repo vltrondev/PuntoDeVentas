@@ -40,15 +40,18 @@ export default function SellerDashboard() {
         try {
             setLoading(true)
 
-            // Ajustar la fecha final para incluir todo el día (23:59:59)
-            const adjustedEndDate = new Date(endDate)
-            adjustedEndDate.setHours(23, 59, 59, 999)
+            // Asegurar que usamos la fecha local correcta
+            const [sy, sm, sd] = startDate.split('-')
+            const adjustedStartDate = new Date(Number(sy), Number(sm) - 1, Number(sd), 0, 0, 0, 0)
+
+            const [ey, em, ed] = endDate.split('-')
+            const adjustedEndDate = new Date(Number(ey), Number(em) - 1, Number(ed), 23, 59, 59, 999)
 
             const { data, error } = await supabase
                 .from('orders')
                 .select('*, contacts(name, email, phone, address)')
                 .eq('assigned_to', user?.id)
-                .gte('created_at', new Date(startDate).toISOString())
+                .gte('created_at', adjustedStartDate.toISOString())
                 .lte('created_at', adjustedEndDate.toISOString())
                 .order('created_at', { ascending: false })
 
