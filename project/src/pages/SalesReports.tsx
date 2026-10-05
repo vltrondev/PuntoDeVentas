@@ -8,6 +8,7 @@ interface DailyStats {
     count: number
     total: number
     cost: number
+    courierCommission: number
     invoiced: number
     paid: number
 }
@@ -18,6 +19,11 @@ interface ProductStats {
     quantity: number
     revenue: number
 }
+
+const COURIER_COMMISSION_PER_DELIVERY = 250
+
+const hasCommissionableCourierDelivery = (order: Order) =>
+    Boolean(order.courier_id && ['delivered', 'paid'].includes(order.status))
 
 export default function SalesReports() {
     const [loading, setLoading] = useState(true)
@@ -136,11 +142,14 @@ export default function SalesReports() {
         const groupedByDay = orders.reduce((acc, order) => {
             const date = new Date(order.created_at).toLocaleDateString()
             if (!acc[date]) {
-                acc[date] = { date, count: 0, total: 0, cost: 0, invoiced: 0, paid: 0 }
+                acc[date] = { date, count: 0, total: 0, cost: 0, courierCommission: 0, invoiced: 0, paid: 0 }
             }
             acc[date].count += 1
             acc[date].total += order.total
             acc[date].cost += (orderCosts[order.id] || 0)
+            if (hasCommissionableCourierDelivery(order)) {
+                acc[date].courierCommission += COURIER_COMMISSION_PER_DELIVERY
+            }
 
             if (order.order_type === 'invoice') acc[date].invoiced += order.total
             if (order.status === 'paid' || order.status === 'delivered') acc[date].paid += order.total
@@ -157,7 +166,10 @@ export default function SalesReports() {
     const totalInvoiced = orders.filter(o => o.order_type === 'invoice').reduce((sum, order) => sum + order.total, 0)
     const totalPaid = orders.filter(o => o.status === 'paid' || o.status === 'delivered').reduce((sum, order) => sum + order.total, 0)
     const totalPending = totalSales - totalPaid
-    const totalProfit = totalSales - totalCost
+    const totalCourierCommission = orders.reduce((sum, order) =>
+        sum + (hasCommissionableCourierDelivery(order) ? COURIER_COMMISSION_PER_DELIVERY : 0), 0
+    )
+    const totalProfit = totalSales - totalCost - totalCourierCommission
 
     const handlePrintClick = () => setShowPrintModal(true)
 
@@ -203,10 +215,13 @@ export default function SalesReports() {
             const stats = currentOrders.reduce((acc, order) => {
                 acc.count += 1
                 acc.total += order.total
+                if (hasCommissionableCourierDelivery(order)) {
+                    acc.courierCommission += COURIER_COMMISSION_PER_DELIVERY
+                }
                 if (order.order_type === 'invoice') acc.invoiced += order.total
                 if (order.status === 'paid' || order.status === 'delivered') acc.paid += order.total
                 return acc
-            }, { date, count: 0, total: 0, cost: totalCostForDay, invoiced: 0, paid: 0 } as DailyStats)
+            }, { date, count: 0, total: 0, cost: totalCostForDay, courierCommission: 0, invoiced: 0, paid: 0 } as DailyStats)
 
             setPrintData(stats)
             setIsPrinting(true)
@@ -294,7 +309,7 @@ export default function SalesReports() {
                                 <div className="p-2 bg-green-200 rounded-lg"><DollarSign className="h-5 w-5 text-green-700" /></div>
                             </div>
                             <p className="text-2xl font-bold text-green-700">{formatCurrency(totalProfit)}</p>
-                            <p className="text-xs text-green-600 mt-1">Ingresos - Costos</p>
+                            <p className="text-xs text-green-600 mt-1">Ingresos - costos - comisión mensajero</p>
                         </div>
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -328,6 +343,7 @@ export default function SalesReports() {
                                             <th className="px-6 py-3 font-medium text-gray-500">Fecha</th>
                                             <th className="px-6 py-3 font-medium text-gray-500">Venta</th>
                                             <th className="px-6 py-3 font-medium text-gray-500">Costo</th>
+                                            <th className="px-6 py-3 font-medium text-gray-500">Comisión mensajero</th>
                                             <th className="px-6 py-3 font-medium text-gray-500">Ganancia</th>
                                             <th className="px-6 py-3 font-medium text-gray-500">Estado</th>
                                         </tr>
@@ -338,7 +354,8 @@ export default function SalesReports() {
                                                 <td className="px-6 py-3 text-gray-900">{day.date}</td>
                                                 <td className="px-6 py-3 text-gray-900 font-medium">{formatCurrency(day.total)}</td>
                                                 <td className="px-6 py-3 text-red-600 text-xs">-{formatCurrency(day.cost)}</td>
-                                                <td className="px-6 py-3 text-green-600 font-bold">{formatCurrency(day.total - day.cost)}</td>
+                                                <td className="px-6 py-3 text-red-600 text-xs">-{formatCurrency(day.courierCommission)}</td>
+                                                <td className="px-6 py-3 text-green-600 font-bold">{formatCurrency(day.total - day.cost - day.courierCommission)}</td>
                                                 <td className="px-6 py-3">
                                                     <span className={`text-xs px-2 py-1 rounded-full ${day.paid >= day.total ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                                                         {day.paid >= day.total ? 'Pagado' : 'Pendiente'}
@@ -348,7 +365,7 @@ export default function SalesReports() {
                                         ))}
                                         {dailyStats.length === 0 && (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                                                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                                     No hay datos para el periodo seleccionado
                                                 </td>
                                             </tr>
@@ -412,9 +429,13 @@ export default function SalesReports() {
                                 <span className="text-gray-600">Costo Estimado:</span>
                                 <span className="font-medium text-red-600">-{formatCurrency(printData.cost)}</span>
                             </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span className="text-gray-600">Comisión de mensajeros vendedores:</span>
+                                <span className="font-medium text-red-600">-{formatCurrency(printData.courierCommission)}</span>
+                            </div>
                             <div className="flex justify-between items-center py-2 mb-4">
                                 <span className="font-medium text-gray-800">Ganancia Real:</span>
-                                <span className="font-bold text-green-700">{formatCurrency(printData.total - printData.cost)}</span>
+                                <span className="font-bold text-green-700">{formatCurrency(printData.total - printData.cost - printData.courierCommission)}</span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 mt-4 pt-4 border-t border-gray-100">
