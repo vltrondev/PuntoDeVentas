@@ -26,10 +26,7 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
   // Payment Method state
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash')
 
-  // Shipping State
-  const [shippingOption, setShippingOption] = useState<'none' | 'santo_domingo' | 'interior'>('none')
-
-  const shippingCost = shippingOption === 'santo_domingo' ? 250 : shippingOption === 'interior' ? 290 : 0
+  const shippingCost = 300
   const finalTotal = cartTotal + shippingCost
 
   // Load data
@@ -200,18 +197,12 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
             </div>
           </div>
 
-          {/* Shipping Selection */}
+          {/* Fixed shipping cost */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Costo de Envío</label>
-            <select
-              className="input-field text-sm py-1"
-              value={shippingOption}
-              onChange={(e) => setShippingOption(e.target.value as 'none' | 'santo_domingo' | 'interior')}
-            >
-              <option value="none">Sin envío (RD $0)</option>
-              <option value="santo_domingo">Santo Domingo (RD $250)</option>
-              <option value="interior">Interior (RD $290)</option>
-            </select>
+            <div className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              {formatPrice(shippingCost)} (fijo)
+            </div>
           </div>
 
           {/* Payment Method */}
@@ -246,12 +237,10 @@ export default function CurrentSale({ onClose }: CurrentSaleProps) {
           <span>Subtotal:</span>
           <span>{formatPrice(cartTotal)}</span>
         </div>
-        {shippingCost > 0 && (
-          <div className="flex justify-between items-center mb-2 text-sm text-gray-500">
-            <span>Envío:</span>
-            <span>{formatPrice(shippingCost)}</span>
-          </div>
-        )}
+        <div className="flex justify-between items-center mb-2 text-sm text-gray-500">
+          <span>Envío:</span>
+          <span>{formatPrice(shippingCost)}</span>
+        </div>
         <div className="flex justify-between items-center mb-4 border-t pt-2">
           <span className="text-lg font-medium text-gray-600">Total</span>
           <span className="text-2xl font-bold text-primary-600">{formatPrice(finalTotal)}</span>

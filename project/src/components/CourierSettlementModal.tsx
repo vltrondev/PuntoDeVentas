@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, DollarSign, Calculator } from 'lucide-react';
 
+const COURIER_COMMISSION_PER_DELIVERY = 250;
+
 interface CourierSettlementModalProps {
     onClose: () => void;
     onUpdate: () => void; // Trigger refresh in parent
@@ -44,8 +46,7 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
             .from('orders')
             .select('*')
             .eq('courier_id', courierId)
-            // Filter for orders that need settlement: pending, shipped, processing AND delivered.
-            .in('status', ['pending', 'shipped', 'processing', 'delivered']);
+            .eq('status', 'delivered');
 
         if (error) {
             console.error('Error fetching orders:', error);
@@ -58,7 +59,7 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
     const handleSettleAll = async () => {
         if (!selectedCourier || pendingOrders.length === 0) return;
 
-        if (!window.confirm(`¿Estás seguro de cobrar ${pendingOrders.length} ordenes? Total: $${totalAmount.toLocaleString()}`)) {
+        if (!window.confirm(`¿Registrar la liquidación de ${pendingOrders.length} entregas? Total neto: $${totalAmount.toLocaleString()}`)) {
             return;
         }
 
@@ -74,7 +75,7 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
 
             if (error) throw error;
 
-            alert('¡Ordenes cobradas exitosamente!');
+            alert('¡Entregas liquidadas exitosamente!');
             onUpdate(); // Refresh parent list
             onClose(); // Close modal
         } catch (error: any) {
@@ -85,7 +86,10 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
         }
     };
 
-    const totalAmount = pendingOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+    const totalAmount = pendingOrders.reduce(
+        (sum, order) => sum + (Number(order.total) || 0) - COURIER_COMMISSION_PER_DELIVERY,
+        0
+    );
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -126,13 +130,13 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
                             ) : (
                                 <>
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="text-blue-700 font-medium">Pedidos Pendientes:</span>
+                                        <span className="text-blue-700 font-medium">Entregas por liquidar:</span>
                                         <span className="bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full text-sm font-bold">
                                             {pendingOrders.length}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center pt-2 border-t border-blue-200">
-                                        <span className="text-blue-900 font-bold text-lg">Total a Cobrar:</span>
+                                        <span className="text-blue-900 font-bold text-lg">Total neto a entregar:</span>
                                         <span className="text-blue-900 font-bold text-xl">
                                             ${totalAmount.toLocaleString()}
                                         </span>
@@ -153,14 +157,14 @@ export default function CourierSettlementModal({ onClose, onUpdate }: CourierSet
                         ) : (
                             <>
                                 <DollarSign className="w-5 h-5" />
-                                Cobrar Todo
+                                Liquidar Entregas
                             </>
                         )}
                     </button>
 
                     {selectedCourier && pendingOrders.length === 0 && !calculating && (
                         <p className="text-center text-sm text-gray-500">
-                            Este mensajero no tiene pedidos pendientes de cobro.
+                            Este mensajero no tiene entregas pendientes de liquidar.
                         </p>
                     )}
                 </div>

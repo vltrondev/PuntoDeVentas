@@ -64,7 +64,7 @@ export default function InvoiceDetailModal({ order, onClose, hidePrint = false }
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 flex justify-between items-start">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">GRUPO NC</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">Grupo Dálet</h2>
                         <p className="text-sm text-gray-500">Detalle de {order.order_type === 'invoice' ? 'Factura' : 'Venta'} #{order.id.substring(0, 8)}</p>
                     </div>
                     {/* Add no-print to close button */}

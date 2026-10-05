@@ -22,9 +22,9 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">NC</span>
+              <span className="text-white font-bold text-lg">GD</span>
             </div>
-            <span className="text-xl font-bold text-gray-800">GRUPO NC</span>
+            <span className="text-xl font-bold text-gray-800">Grupo Dálet</span>
           </Link>
 
           {/* Search Bar - Desktop */}
