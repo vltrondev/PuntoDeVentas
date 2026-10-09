@@ -7,11 +7,12 @@ CREATE POLICY "Couriers can view assigned orders"
 ON orders FOR SELECT
 TO authenticated
 USING (
-  assigned_to = auth.uid() 
-  OR 
-  user_id = auth.uid() 
-  OR 
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  user_id = auth.uid()
+  OR (
+    (courier_id = auth.uid() OR assigned_to = auth.uid())
+    AND auth.jwt() -> 'app_metadata' ->> 'role' = 'courier'
+  )
+  OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
 
 -- 2. Order Items: Essential for the dashboard details

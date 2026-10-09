@@ -12,7 +12,7 @@ export default function CourierDashboard() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
-
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -23,11 +23,11 @@ export default function CourierDashboard() {
     const fetchAssignedOrders = async () => {
         try {
             setLoading(true);
+            setFetchError(null);
             const { data, error } = await supabase
                 .from('orders')
                 .select(`
           *,
-          profiles:user_id (email),
           contacts (name, address, phone),
           order_items (
             quantity,
@@ -35,13 +35,14 @@ export default function CourierDashboard() {
             product:products (name, image_url)
           )
         `)
-                .eq('courier_id', user?.id)
+                .or(`assigned_to.eq.${user?.id},courier_id.eq.${user?.id}`)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
             setOrders(data || []);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            setFetchError(error instanceof Error ? error.message : JSON.stringify(error));
         } finally {
             setLoading(false);
         }
@@ -160,6 +161,13 @@ export default function CourierDashboard() {
 
     return (
         <div className="space-y-6">
+            {fetchError && (
+                <div role="alert" className="rounded border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+                    <p className="font-semibold">No se pudieron cargar las órdenes asignadas.</p>
+                    <p className="mt-1 break-words">{fetchError}</p>
+                    <button onClick={fetchAssignedOrders} className="mt-3 underline">Reintentar</button>
+                </div>
+            )}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">Envíos Asignados</h2>

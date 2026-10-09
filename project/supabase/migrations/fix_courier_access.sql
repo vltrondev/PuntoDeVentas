@@ -8,9 +8,11 @@ CREATE POLICY "Couriers can view assigned orders"
 ON orders FOR SELECT
 TO authenticated
 USING (
-  assigned_to = auth.uid() 
-  OR 
-  user_id = auth.uid() -- Still allow seeing their own created orders if any
+  user_id = auth.uid()
+  OR (
+    (courier_id = auth.uid() OR assigned_to = auth.uid())
+    AND auth.jwt() -> 'app_metadata' ->> 'role' = 'courier'
+  )
 );
 
 -- 2. Ensure they can update status of assigned orders
@@ -19,5 +21,11 @@ DROP POLICY IF EXISTS "Couriers can update assigned orders" ON orders;
 CREATE POLICY "Couriers can update assigned orders"
 ON orders FOR UPDATE
 TO authenticated
-USING (assigned_to = auth.uid())
-WITH CHECK (assigned_to = auth.uid());
+USING (
+  (courier_id = auth.uid() OR assigned_to = auth.uid())
+  AND auth.jwt() -> 'app_metadata' ->> 'role' = 'courier'
+)
+WITH CHECK (
+  (courier_id = auth.uid() OR assigned_to = auth.uid())
+  AND auth.jwt() -> 'app_metadata' ->> 'role' = 'courier'
+);

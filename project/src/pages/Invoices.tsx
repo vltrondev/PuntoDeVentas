@@ -222,6 +222,8 @@ export default function Invoices() {
         }))
     ];
 
+    const courierOptions = userOptions;
+
     if (loading) return <div>Cargando facturas...</div>
 
     return (
@@ -333,7 +335,7 @@ export default function Invoices() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div onClick={(e) => e.stopPropagation()} className="min-w-[150px]">
                                             <SearchableSelect
-                                                options={userOptions}
+                                                options={courierOptions}
                                                 value={order.courier_id || ''}
                                                 onChange={(val) => handleAssignCourier(order.id, val)}
                                                 placeholder="Sin asignar"

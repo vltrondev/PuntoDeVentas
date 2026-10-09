@@ -74,10 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.access_token !== sessionRef.current?.access_token) {
-                setData();
+                window.setTimeout(() => { void setData(); }, 0);
             } else if (!session && sessionRef.current) {
                 // Handle logout specifically if needed, or let setData handle it
-                setData();
+                window.setTimeout(() => { void setData(); }, 0);
             }
         });
 
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         role,
         isAdmin: role?.toLowerCase() === 'admin',
-        isCourier: role?.toLowerCase() === 'courier',
+        isCourier: String(user?.app_metadata?.role ?? '').toLowerCase() === 'courier',
         loading,
         signIn,
         signUp,

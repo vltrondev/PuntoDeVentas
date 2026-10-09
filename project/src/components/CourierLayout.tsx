@@ -3,7 +3,11 @@ import { useAuth } from '../hooks/useAuth';
 import { LogOut, Truck } from 'lucide-react';
 
 export default function CourierLayout() {
-    const { user, isCourier, signOut } = useAuth();
+    const { user, isCourier, loading, signOut } = useAuth();
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+    }
 
     if (!user || !isCourier) {
         return <Navigate to="/login" replace />;
